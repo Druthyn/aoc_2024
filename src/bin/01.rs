@@ -2,10 +2,20 @@ advent_of_code::solution!(1);
 
 use std::collections::HashMap;
 
-use advent_of_code as aoc;
+fn split_file_into_int_lists(input: &str) -> (Vec<u32>, Vec<u32>) {
+    let parsed_input = input.split_ascii_whitespace()
+                                                        .map(|x| x.parse().unwrap());
+    let left: Vec<u32> = parsed_input.clone()
+                                            .step_by(2)
+                                            .collect();
+    let right: Vec<u32> = parsed_input.skip(1)
+                                            .step_by(2)
+                                            .collect();
+    (left, right)
+}
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let (mut left, mut right) = aoc::split_file_into_int_lists(input);
+    let (mut left, mut right) = split_file_into_int_lists(input);
     left.sort();
     right.sort();
 
@@ -16,7 +26,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (left, right) = aoc::split_file_into_int_lists(input);
+    let (left, right) = split_file_into_int_lists(input);
     let mut right_buckets = HashMap::new();
 
     for x in right {
