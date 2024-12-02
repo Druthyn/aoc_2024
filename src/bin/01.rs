@@ -3,14 +3,9 @@ advent_of_code::solution!(1);
 use std::collections::HashMap;
 
 fn split_file_into_int_lists(input: &str) -> (Vec<u32>, Vec<u32>) {
-    let parsed_input = input.split_ascii_whitespace()
-                                                        .map(|x| x.parse().unwrap());
-    let left: Vec<u32> = parsed_input.clone()
-                                            .step_by(2)
-                                            .collect();
-    let right: Vec<u32> = parsed_input.skip(1)
-                                            .step_by(2)
-                                            .collect();
+    let parsed_input = input.split_ascii_whitespace().map(|x| x.parse().unwrap());
+    let left: Vec<u32> = parsed_input.clone().step_by(2).collect();
+    let right: Vec<u32> = parsed_input.skip(1).step_by(2).collect();
     (left, right)
 }
 
@@ -19,23 +14,25 @@ pub fn part_one(input: &str) -> Option<u32> {
     left.sort();
     right.sort();
 
-    Some(left.into_iter()
-                .zip(right)
-                .map(|(l, r)| (l).abs_diff(r))
-                .sum())
+    Some(
+        left.into_iter()
+            .zip(right)
+            .map(|(l, r)| (l).abs_diff(r))
+            .sum(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let (left, right) = split_file_into_int_lists(input);
     let mut right_buckets = HashMap::new();
 
-    for x in right {
-        right_buckets.insert(x, right_buckets.get(&x).unwrap_or(&0) + 1);
+    for v in right {
+        right_buckets.insert(v, right_buckets.get(&v).unwrap_or(&0) + 1);
     }
 
     let mut sum = 0;
-    for x in left {
-        sum += right_buckets.get(&x).unwrap_or(&0) * x;
+    for v in left {
+        sum += right_buckets.get(&v).unwrap_or(&0) * v;
     }
     Some(sum)
 }
