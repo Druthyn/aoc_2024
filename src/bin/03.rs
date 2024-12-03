@@ -15,13 +15,6 @@ pub fn part_one(input: &str) -> Option<u32> {
             })
             .sum(),
     )
-    // Some(
-    //     re.captures_iter(input)
-    //         .map(|c| c.extract())
-    //         .map(|(_, [x, y])| (x.parse().unwrap(), y.parse().unwrap()))
-    //         .map(|(x, y): (u32, u32)| x * y)
-    //         .sum(),
-    // )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
