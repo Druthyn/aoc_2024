@@ -19,7 +19,7 @@ fn parse_input(input: &str) -> (RuleMap, Vec<Vec<&str>>) {
     let mut is_pages = false;
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             is_pages = true;
             continue;
         }
@@ -95,7 +95,7 @@ fn order_pages<'a>(rules_map: &'a RuleMap, pages: &[&'a str]) -> Vec<&'a str> {
         let page = **page_set
             .difference(&page_values)
             .collect::<Vec<_>>()
-            .get(0)
+            .first()
             .unwrap();
 
         page_set.remove(page);

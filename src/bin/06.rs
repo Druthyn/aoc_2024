@@ -5,16 +5,16 @@ advent_of_code::solution!(6);
 #[derive(Clone, Copy)]
 struct Guard {
     position: (isize, isize),
-    direction: DIRECTION,
+    direction: Direction,
 }
 
 impl Guard {
     fn next_position(&self) -> (isize, isize) {
         let delta: (isize, isize) = match self.direction {
-            DIRECTION::Up => (0, -1),
-            DIRECTION::Right => (1, 0),
-            DIRECTION::Down => (0, 1),
-            DIRECTION::Left => (-1, 0),
+            Direction::Up => (0, -1),
+            Direction::Right => (1, 0),
+            Direction::Down => (0, 1),
+            Direction::Left => (-1, 0),
         };
 
         (self.position.0 + delta.0, self.position.1 + delta.1)
@@ -26,30 +26,30 @@ impl Guard {
 }
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq)]
-enum DIRECTION {
+enum Direction {
     Up,
     Right,
     Down,
     Left,
 }
 
-impl DIRECTION {
-    fn from(c: char) -> DIRECTION {
+impl Direction {
+    fn from(c: char) -> Direction {
         match c {
-            '>' => DIRECTION::Right,
-            'v' => DIRECTION::Down,
-            '<' => DIRECTION::Left,
-            '^' => DIRECTION::Up,
+            '>' => Direction::Right,
+            'v' => Direction::Down,
+            '<' => Direction::Left,
+            '^' => Direction::Up,
             _ => panic!(),
         }
     }
 
-    fn next(&self) -> DIRECTION {
+    fn next(&self) -> Direction {
         match self {
-            DIRECTION::Up => DIRECTION::Right,
-            DIRECTION::Right => DIRECTION::Down,
-            DIRECTION::Down => DIRECTION::Left,
-            DIRECTION::Left => DIRECTION::Up,
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
         }
     }
 }
@@ -57,7 +57,7 @@ impl DIRECTION {
 fn parse_grid(input: &str) -> (Vec<Vec<char>>, Guard) {
     let mut guard = Guard {
         position: (0, 0),
-        direction: DIRECTION::Left,
+        direction: Direction::Left,
     };
     let mut grid: Vec<Vec<char>> = vec![];
 
@@ -68,7 +68,7 @@ fn parse_grid(input: &str) -> (Vec<Vec<char>>, Guard) {
             None => (),
             Some(c) => {
                 guard.position = (c as isize, i as isize);
-                guard.direction = DIRECTION::from(line.chars().nth(c).unwrap());
+                guard.direction = Direction::from(line.chars().nth(c).unwrap());
                 grid[i][c] = '.';
             }
         }
@@ -103,7 +103,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub fn part_two(input: &str) -> Option<u32> {
     let (mut grid, mut guard) = parse_grid(input);
 
-    let init_guard = guard.clone();
+    let init_guard = guard;
 
     loop {
         let (x, y) = guard.position;
@@ -127,8 +127,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     let potential_positions: HashSet<(usize, usize)> = grid
         .iter()
         .enumerate()
-        .map(|(y, list)| list.into_iter().enumerate().map(move |(x, &c)| (x, y, c)))
-        .flatten()
+        .flat_map(|(y, list)| list.iter().enumerate().map(move |(x, &c)| (x, y, c)))
         .filter(|(_, _, c)| c == &'x')
         .map(|(x, y, _)| (x, y))
         .collect();
@@ -138,15 +137,11 @@ pub fn part_two(input: &str) -> Option<u32> {
     for (x, y) in potential_positions {
         let mut new_grid = grid.clone();
         new_grid[y][x] = '#';
-        let mut guard = init_guard.clone();
-        let mut previous_pose: HashSet<(isize, isize, DIRECTION)> = HashSet::new();
+        let mut guard = init_guard;
+        let mut previous_pose: HashSet<(isize, isize, Direction)> = HashSet::new();
 
         loop {
-            if previous_pose.contains(&(
-                guard.position.0,
-                guard.position.1,
-                guard.direction.clone(),
-            )) {
+            if previous_pose.contains(&(guard.position.0, guard.position.1, guard.direction)) {
                 cum += 1;
                 break;
             }
@@ -170,10 +165,10 @@ pub fn part_two(input: &str) -> Option<u32> {
                 if !(x_prime < 0
                     || x_prime >= new_grid[0].len() as isize
                     || y_prime < 0
-                    || y_prime >= new_grid.len() as isize
-                    || new_grid[y_prime as usize][x_prime as usize] == '#') {
-                        guard.direction = guard.direction.next();
-
+                    || y_prime >= new_grid.len() as isize)
+                    && new_grid[y_prime as usize][x_prime as usize] == '#'
+                {
+                    guard.direction = guard.direction.next();
                 }
             }
             guard.step();

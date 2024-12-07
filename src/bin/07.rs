@@ -28,7 +28,12 @@ fn operations_builder(n: usize, is_part2: bool) -> Vec<Vec<char>> {
 fn parse_line(line: &str) -> (u64, Vec<u64>) {
     let mut parts_iter = line.split(' ');
 
-    let res = parts_iter.next().unwrap().trim_matches(':').parse::<u64>().unwrap();
+    let res = parts_iter
+        .next()
+        .unwrap()
+        .trim_matches(':')
+        .parse::<u64>()
+        .unwrap();
 
     let components = Vec::from_iter(parts_iter.map(|e| e.parse::<u64>().unwrap()));
 
@@ -36,12 +41,11 @@ fn parse_line(line: &str) -> (u64, Vec<u64>) {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-
     let mut cum = 0;
 
     for line in input.lines() {
         let (res, components) = parse_line(line);
-        let operations = operations_builder(components.len()-1, false);
+        let operations = operations_builder(components.len() - 1, false);
         for op in operations {
             let mut numbers = components.clone().into_iter();
             let mut acc = numbers.next().unwrap();
@@ -69,7 +73,7 @@ pub fn part_two(input: &str) -> Option<u64> {
 
     for line in input.lines() {
         let (res, components) = parse_line(line);
-        let operations = operations_builder(components.len()-1, true);
+        let operations = operations_builder(components.len() - 1, true);
         for op in operations {
             let mut numbers = components.clone().into_iter();
             let mut acc = numbers.next().unwrap();
