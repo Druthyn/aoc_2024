@@ -31,21 +31,21 @@ fn transpose2<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    fn get_diagnonals(grid: &Vec<Vec<char>>) -> Vec<Vec<char>> {
+    fn get_diagnonals(grid: &[Vec<char>]) -> Vec<Vec<char>> {
         let mut lines = vec![];
 
         for offset in 0.. {
             let mut line: Vec<char> = vec![];
             for i in 0.. {
                 match grid.get(i + offset) {
-                    Some(&ref l) => match l.get(i) {
+                    Some(l) => match l.get(i) {
                         Some(&c) => line.push(c),
                         None => break,
                     },
                     None => break,
                 }
             }
-            if line.len() == 0 {
+            if line.is_empty() {
                 break;
             }
             lines.push(line);
@@ -55,14 +55,14 @@ pub fn part_one(input: &str) -> Option<u32> {
             let mut line: Vec<char> = vec![];
             for i in 0.. {
                 match grid.get(i) {
-                    Some(&ref l) => match l.get(i + offset) {
+                    Some(l) => match l.get(i + offset) {
                         Some(&c) => line.push(c),
                         None => break,
                     },
                     None => break,
                 }
             }
-            if line.len() == 0 {
+            if line.is_empty() {
                 break;
             }
             lines.push(line);
