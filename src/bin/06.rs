@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 advent_of_code::solution!(6);
 
+#[derive(Clone, Copy)]
 struct Guard {
     position: (isize, isize),
     direction: DIRECTION,
@@ -22,6 +25,7 @@ impl Guard {
     }
 }
 
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
 enum DIRECTION {
     Up,
     Right,
@@ -97,9 +101,86 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (mut _grid, _guard) = parse_grid(input);
+    let (mut grid, mut guard) = parse_grid(input);
 
-    None
+    let init_guard = guard.clone();
+
+    loop {
+        let (x, y) = guard.position;
+        grid[y as usize][x as usize] = 'x';
+        let (x_prime, y_prime) = guard.next_position();
+        if x_prime < 0
+            || x_prime >= grid[0].len() as isize
+            || y_prime < 0
+            || y_prime >= grid.len() as isize
+        {
+            break;
+        }
+        if grid[y_prime as usize][x_prime as usize] == '#' {
+            guard.direction = guard.direction.next();
+        }
+        guard.step();
+    }
+
+    grid[init_guard.position.0 as usize][init_guard.position.1 as usize] = '.';
+
+    let potential_positions: HashSet<(usize, usize)> = grid
+        .iter()
+        .enumerate()
+        .map(|(y, list)| list.into_iter().enumerate().map(move |(x, &c)| (x, y, c)))
+        .flatten()
+        .filter(|(_, _, c)| c == &'x')
+        .map(|(x, y, _)| (x, y))
+        .collect();
+
+    let mut cum = 0;
+
+    for (x, y) in potential_positions {
+        let mut new_grid = grid.clone();
+        new_grid[y][x] = '#';
+        let mut guard = init_guard.clone();
+        let mut previous_pose: HashSet<(isize, isize, DIRECTION)> = HashSet::new();
+
+        loop {
+            if previous_pose.contains(&(
+                guard.position.0,
+                guard.position.1,
+                guard.direction.clone(),
+            )) {
+                cum += 1;
+                break;
+            }
+            let (x, y) = guard.position;
+            new_grid[y as usize][x as usize] = 'x';
+
+            let (x_prime, y_prime) = guard.next_position();
+            if x_prime < 0
+                || x_prime >= new_grid[0].len() as isize
+                || y_prime < 0
+                || y_prime >= new_grid.len() as isize
+            {
+                break;
+            }
+
+            previous_pose.insert((guard.position.0, guard.position.1, guard.direction));
+
+            if new_grid[y_prime as usize][x_prime as usize] == '#' {
+                guard.direction = guard.direction.next();
+                let (x_prime, y_prime) = guard.next_position();
+                if !(x_prime < 0
+                    || x_prime >= new_grid[0].len() as isize
+                    || y_prime < 0
+                    || y_prime >= new_grid.len() as isize
+                    || new_grid[y_prime as usize][x_prime as usize] == '#') {
+                        guard.direction = guard.direction.next();
+
+                }
+            }
+            guard.step();
+        }
+    }
+
+    Some(cum)
 }
 
 #[cfg(test)]
