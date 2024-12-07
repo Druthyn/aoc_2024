@@ -21,19 +21,6 @@ impl From<U32Str<'_>> for Vec<u32> {
     }
 }
 
-fn sublists(input: &[u32]) -> Vec<Vec<u32>> {
-    let mut output = vec![];
-    for i in 0..input.len() {
-        let (_, sublist): (Vec<usize>, Vec<u32>) = input
-            .iter()
-            .enumerate()
-            .filter(|(index, _)| *index != i)
-            .unzip();
-        output.push(sublist);
-    }
-    output
-}
-
 fn is_report_safe(report: &mut [u32]) -> bool {
     // Reverse list if needed for sorted check
     if report[0] > report[1] {
@@ -74,7 +61,12 @@ pub fn part_two(input: &str) -> Option<u32> {
         match is_report_safe(&mut list) {
             true => count += 1,
             false => {
-                for mut sublist in sublists(&list) {
+                for i in 0..list.len() {
+                    let (_, mut sublist): (Vec<usize>, Vec<u32>) = list
+                        .iter()
+                        .enumerate()
+                        .filter(|(index, _)| *index != i)
+                        .unzip();
                     if is_report_safe(&mut sublist) {
                         count += 1;
                         break;
