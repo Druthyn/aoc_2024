@@ -7,10 +7,10 @@ pub fn part_one(input: &str) -> Option<u32> {
 
     Some(
         re.find_iter(input)
-            .map(|x| {
-                x.as_str()[4..x.len() - 1]
+            .map(|reg_match| {
+                reg_match.as_str()[4..reg_match.len() - 1]
                     .split(',')
-                    .map(|x| x.parse::<u32>().unwrap())
+                    .map(|int_str| int_str.parse::<u32>().unwrap())
                     .product::<u32>()
             })
             .sum(),
@@ -20,20 +20,20 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub fn part_two(input: &str) -> Option<u32> {
     let re = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)|do\(\)()()|don't\(\)()()").unwrap();
 
-    let mut flag: bool = true;
+    let mut is_mul_active = true;
     let mut sum = 0;
-    for x in re.find_iter(input).map(|x| x.as_str()) {
-        match &x[0..3] {
+    for reg_match in re.find_iter(input).map(|reg_match| reg_match.as_str()) {
+        match &reg_match[0..3] {
             "mul" => {
-                if flag {
-                    sum += x[4..x.len() - 1]
+                if is_mul_active {
+                    sum += reg_match[4..reg_match.len() - 1]
                         .split(',')
-                        .map(|x| x.parse::<u32>().unwrap())
+                        .map(|int_str| int_str.parse::<u32>().unwrap())
                         .product::<u32>();
                 }
             }
-            "do(" => flag = true,
-            "don" => flag = false,
+            "do(" => is_mul_active = true,
+            "don" => is_mul_active = false,
             _ => panic!(),
         }
     }
