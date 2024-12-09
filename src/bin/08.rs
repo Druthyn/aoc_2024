@@ -7,12 +7,15 @@ type AntennaMap = HashMap<char, HashSet<Position>>;
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct Position {
     x: isize,
-    y: isize
+    y: isize,
 }
 
 impl Position {
     fn new(x: usize, y: usize) -> Self {
-        Position{x: x as isize, y: y as isize }
+        Position {
+            x: x as isize,
+            y: y as isize,
+        }
     }
 }
 
@@ -20,7 +23,10 @@ impl std::ops::Add for Position {
     type Output = Position;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Position {x: self.x + rhs.x, y: self.y + rhs.y}
+        Position {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
     }
 }
 
@@ -28,7 +34,10 @@ impl std::ops::Sub for Position {
     type Output = Position;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Position {x: self.x - rhs.x, y: self.y - rhs.y}
+        Position {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
     }
 }
 
@@ -44,19 +53,25 @@ fn parse_input(input: &str) -> (AntennaMap, (usize, usize)) {
             .enumerate()
             .filter(|(_, c)| *c != '.')
             .for_each(|(x, c)| {
-                out.entry(c).or_insert_with(HashSet::new).insert(Position::new(x, y));
+                out.entry(c)
+                    .or_insert_with(HashSet::new)
+                    .insert(Position::new(x, y));
             });
-
     }
     (out, dims)
 }
 
-fn get_antinodes_part(a: &Position, b: &Position, limit: &(usize, usize), is_part_2: bool) -> Option<Vec<Position>> {
+fn get_antinodes_part(
+    a: &Position,
+    b: &Position,
+    limit: &(usize, usize),
+    is_part_2: bool,
+) -> Option<Vec<Position>> {
     fn is_valid(pos: Position, limit: &(usize, usize)) -> bool {
         !(pos.x < 0 || pos.y < 0 || pos.x >= limit.0 as isize || pos.y >= limit.1 as isize)
     }
     let delta = *a - *b;
-    let mut out = vec!{};
+    let mut out = vec![];
 
     if is_part_2 {
         let mut anti_a = *a;
@@ -99,12 +114,11 @@ fn solve(input: &str, is_part_two: bool) -> Option<u32> {
         for station1 in stations.get(station_type).unwrap() {
             for station2 in stations.get(station_type).unwrap() {
                 if station1 != station2 {
-                    if let Some(v) =  get_antinodes_part(station1, station2, &limits, is_part_two) {
+                    if let Some(v) = get_antinodes_part(station1, station2, &limits, is_part_two) {
                         for antinode in v {
                             antinodes.insert(antinode);
                         }
                     }
-
                 }
             }
         }
@@ -139,14 +153,18 @@ mod tests {
     #[test]
     fn answer_part_one() {
         let result = part_one(&advent_of_code::template::read_file("inputs", DAY));
-        let answer = advent_of_code::template::read_file_part("answers", DAY, 1).parse().unwrap();
+        let answer = advent_of_code::template::read_file_part("answers", DAY, 1)
+            .parse()
+            .unwrap();
         assert_eq!(result, Some(answer));
     }
 
     #[test]
     fn answer_part_two() {
         let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
-        let answer = advent_of_code::template::read_file_part("answers", DAY, 2).parse().unwrap();
+        let answer = advent_of_code::template::read_file_part("answers", DAY, 2)
+            .parse()
+            .unwrap();
         assert_eq!(result, Some(answer));
     }
 }
