@@ -1,4 +1,4 @@
-use std::{ops::BitXor, str::FromStr, thread::sleep, time::Duration};
+use std::{ops::BitXor, str::FromStr};
 
 use advent_of_code::split_input_at_emptyline;
 
@@ -142,7 +142,7 @@ pub fn part_one(input: &str) -> Option<String> {
     Some(all_out[1..].to_string())
 }
 
-pub fn part_two(input: &str) -> Option<i64> {
+pub fn part_two(_input: &str) -> Option<i64> {
     None
 }
 
