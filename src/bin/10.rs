@@ -1,45 +1,8 @@
 use std::collections::HashSet;
 
+use advent_of_code::get_neighbours;
+
 advent_of_code::solution!(10);
-
-fn get_neighbours(x: usize, y: usize, grid: &[Vec<u32>]) -> [Option<(usize, usize)>; 4] {
-    let mut out = [None; 4];
-
-    let mut tail = 0;
-    let ys = if y == 0 {
-        vec![y + 1]
-    } else {
-        vec![y - 1, y + 1]
-    };
-
-    let xs = if x == 0 {
-        vec![x + 1]
-    } else {
-        vec![x - 1, x + 1]
-    };
-
-    for y in ys {
-        out[tail] = match grid.get(y) {
-            Some(row) => row.get(x).map(|_| (x, y)),
-            None => None,
-        };
-        if out[tail].is_some() {
-            tail += 1;
-        }
-    }
-
-    for x in xs {
-        out[tail] = match grid.get(y) {
-            Some(row) => row.get(x).map(|_| (x, y)),
-            None => None,
-        };
-        if out[tail].is_some() {
-            tail += 1;
-        }
-    }
-
-    out
-}
 
 fn count_trails_bfs(x: usize, y: usize, grid: &[Vec<u32>]) -> usize {
     let mut search_stack = vec![(x, y)];
@@ -47,7 +10,12 @@ fn count_trails_bfs(x: usize, y: usize, grid: &[Vec<u32>]) -> usize {
     let mut search_set = HashSet::new();
     while peak != 9 && !search_stack.is_empty() {
         for (x, y) in search_stack.drain(..) {
-            get_neighbours(x, y, grid).into_iter().flatten().for_each(|v| {search_set.insert(v);});
+            get_neighbours(x, y, grid)
+                .into_iter()
+                .flatten()
+                .for_each(|v| {
+                    search_set.insert(v);
+                });
         }
 
         for (x, y) in search_set.drain() {
