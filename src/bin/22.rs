@@ -6,7 +6,8 @@ pub fn part_one(input: &str) -> Option<u64> {
     let mut numbers: Vec<u64> = input.lines().map(|s| s.parse::<u64>().unwrap()).collect();
 
     for _ in 0..2000 {
-        numbers = numbers.iter()
+        numbers = numbers
+            .iter()
             .map(|v| v.bitxor(v << 6).bitand(0xFFFFFF))
             .map(|v| v.bitxor(v >> 5).bitand(0xFFFFFF))
             .map(|v| v.bitxor(v << 11).bitand(0xFFFFFF))
@@ -16,8 +17,8 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(numbers.iter().sum())
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    let mut numbers: Vec<u64> = input.lines().map(|s| s.parse::<u64>().unwrap()).collect();
+pub fn part_two(_input: &str) -> Option<u32> {
+    // let mut numbers: Vec<u64> = input.lines().map(|s| s.parse::<u64>().unwrap()).collect();
     None
 }
 

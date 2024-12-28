@@ -83,7 +83,6 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    return None;
     let map_moves = split_input_at_emptyline(input);
 
     let big_map = map_moves[0].iter().map(|l| l.chars().flat_map(|c| {
@@ -141,6 +140,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                                             _ => panic!()
                                         };
                                         map.swap(test_position, inter_position);
+                                        test_position = inter_position;
                                     }
                                     map.swap(position, test_position);
                                     map.swap(test_position, new_position);
