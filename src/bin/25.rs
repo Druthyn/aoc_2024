@@ -11,10 +11,11 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut locks = vec![];
 
     for item in keylocks {
-        let number = item.join("")
+        let number = item
+            .join("")
             .chars()
             .filter(|&c| c == '.' || c == '#')
-            .map(|c| if c == '.' {0} else {1})
+            .map(|c| if c == '.' { 0 } else { 1 })
             .fold(0, |acc, digit| (acc << 1) + digit);
 
         if number.bitand(0b11111) == 0b11111 {
@@ -35,7 +36,6 @@ pub fn part_one(input: &str) -> Option<u32> {
     }
     Some(cum)
 }
-
 
 pub fn part_two(_input: &str) -> Option<u32> {
     None
