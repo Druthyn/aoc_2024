@@ -17,13 +17,17 @@ pub fn split_input_at_emptyline(input: &str) -> Vec<Vec<&str>> {
 }
 
 pub mod grid {
-    use std::{fmt::{Debug, Display}, ops::Deref};
+    use std::{
+        fmt::{Debug, Display}, ops::Deref
+    };
 
     #[derive(Debug)]
     pub struct Grid<T>(Vec<Vec<T>>);
 
-    impl<T> Grid<T> where T: Copy {
-
+    impl<T> Grid<T>
+    where
+        T: Copy,
+    {
         pub fn new(inner: Vec<Vec<T>>) -> Self {
             Grid(inner)
         }
@@ -44,18 +48,57 @@ pub mod grid {
 
         pub fn swap(&mut self, lhs: (usize, usize), rhs: (usize, usize)) -> bool {
             match self.get_mut(lhs) {
-                Some(&mut l) => {
-                    match self.get_mut(rhs) {
-                        Some(&mut r) => {
-                            self.0[lhs.1][lhs.0] = r;
-                            self.0[rhs.1][rhs.0] = l;
-                            true
-                        }
-                        None => false,
+                Some(&mut l) => match self.get_mut(rhs) {
+                    Some(&mut r) => {
+                        self.0[lhs.1][lhs.0] = r;
+                        self.0[rhs.1][rhs.0] = l;
+                        true
                     }
+                    None => false,
                 },
                 None => false,
             }
+        }
+
+        pub fn get_neighbours_4(&self, center: (usize, usize)) -> Vec<(T, (usize, usize))> {
+            let mut out = vec![];
+
+            let xs = [center.0.wrapping_sub(1), center.0.saturating_add(1)];
+            let ys = [center.1.wrapping_sub(1), center.1.saturating_add(1)];
+
+            for x in xs {
+                if let Some(&v) = self.get((x, center.1)) {
+                    out.push((v, (x, center.1)))
+                }
+            }
+
+            for y in ys {
+                if let Some(&v) = self.get((center.0, y)) {
+                    out.push((v, (center.0, y)));
+                }
+            }
+
+            out
+        }
+
+        pub fn get_neighbours_8(&self, center: (usize, usize)) -> Vec<(T, (usize, usize))> {
+            let mut out = vec![];
+
+            let xs = center.0.wrapping_sub(1)..center.0.saturating_add(1);
+
+            for x in xs {
+                let ys = center.1.wrapping_sub(1)..center.1.saturating_add(1);
+                for y in ys {
+                    if (x, y) == center {
+                        continue;
+                    }
+                    if let Some(&v) = self.get((x, y)) {
+                        out.push((v, (x, y)));
+                    }
+                }
+            }
+
+            out
         }
     }
 
