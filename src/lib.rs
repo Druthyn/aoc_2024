@@ -16,6 +16,70 @@ pub fn split_input_at_emptyline(input: &str) -> Vec<Vec<&str>> {
     out
 }
 
+pub mod grid {
+    use std::{fmt::{Debug, Display}, ops::Deref};
+
+    #[derive(Debug)]
+    pub struct Grid<T>(Vec<Vec<T>>);
+
+    impl<T> Grid<T> where T: Copy {
+
+        pub fn new(inner: Vec<Vec<T>>) -> Self {
+            Grid(inner)
+        }
+
+        pub fn get(&self, (x, y): (usize, usize)) -> Option<&T> {
+            match self.0.get(y) {
+                Some(row) => row.get(x),
+                None => None,
+            }
+        }
+
+        pub fn get_mut(&mut self, (x, y): (usize, usize)) -> Option<&mut T> {
+            match self.0.get_mut(y) {
+                Some(row) => row.get_mut(x),
+                None => None,
+            }
+        }
+
+        pub fn swap(&mut self, lhs: (usize, usize), rhs: (usize, usize)) -> bool {
+            match self.get_mut(lhs) {
+                Some(&mut l) => {
+                    match self.get_mut(rhs) {
+                        Some(&mut r) => {
+                            self.0[lhs.1][lhs.0] = r;
+                            self.0[rhs.1][rhs.0] = l;
+                            true
+                        }
+                        None => false,
+                    }
+                },
+                None => false,
+            }
+        }
+    }
+
+    impl<T> Deref for Grid<T> {
+        type Target = Vec<Vec<T>>;
+
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
+    }
+
+    impl<T: Debug + Display> Display for Grid<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            for line in &self.0 {
+                for item in line {
+                    write!(f, "{item}")?;
+                }
+                writeln!(f)?;
+            }
+            Ok(())
+        }
+    }
+}
+
 pub fn get_neighbours(x: usize, y: usize, grid: &[Vec<u32>]) -> [Option<(usize, usize)>; 4] {
     let mut out = [None; 4];
 
