@@ -41,7 +41,7 @@ pub fn part_one(input: &str) -> Option<u64> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut stones: Vec<u64> = input.split(" ").map(|s| s.parse().unwrap()).collect();
-    for _ in 0..75 {
+    for _ in 0..7 {
         stones = blink_naive(&stones);
     }
     Some(stones.len() as u64)
