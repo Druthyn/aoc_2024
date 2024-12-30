@@ -56,17 +56,17 @@ pub fn solve(input: &str, is_part2: bool) -> Option<u64> {
             let mut numbers = components.clone().into_iter();
             let mut acc = numbers.next().unwrap();
 
-            let x = successors(Some((0, ops)), |(_, op)| {
+            let ops_iter = successors(Some((0, ops)), |(_, op)| {
                 if *op == 0 {
-                None
-            } else {
-                Some((
-                    op % 10,
-                    op / 10
-                ))
-            }}).skip(1).map(|(n, _)| n);
+                    None
+                } else {
+                    Some((op % 10, op / 10))
+                }
+            })
+            .skip(1)
+            .map(|(n, _)| n);
 
-            for (num, op) in numbers.zip(x) {
+            for (num, op) in numbers.zip(ops_iter) {
                 match op {
                     1 => acc += num,
                     2 => acc *= num,
@@ -75,7 +75,6 @@ pub fn solve(input: &str, is_part2: bool) -> Option<u64> {
                         acc += num;
                     }
                     _ => panic!("{}", ops),
-
                 }
             }
 
