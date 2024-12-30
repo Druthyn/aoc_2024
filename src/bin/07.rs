@@ -1,27 +1,31 @@
+use std::{collections::HashMap, iter::successors};
+
 advent_of_code::solution!(7);
 
-fn operations_builder(n: usize, is_part2: bool) -> Vec<Vec<char>> {
-    fn operation_builder_helper(input: Vec<Vec<char>>, is_part2: bool) -> Vec<Vec<char>> {
-        let mut out = vec![];
-        for mut list in input {
-            let mut list2 = list.clone();
-            list2.push('*');
-            out.push(list2);
-            if is_part2 {
-                let mut list3 = list.clone();
-                list3.push('|');
-                out.push(list3);
-            }
-            list.push('+');
-            out.push(list)
-        }
-        out
+fn operations_builder(
+    n: usize,
+    is_part2: bool,
+    memos: &mut HashMap<(usize, bool), Vec<u64>>,
+) -> Vec<u64> {
+    if memos.contains_key(&(n, is_part2)) {
+        return memos.get(&(n, is_part2)).unwrap().clone();
     }
 
-    let mut out = vec![Vec::new()];
-    for _ in 0..n {
-        out = operation_builder_helper(out, is_part2)
+    if n == 0 {
+        return if is_part2 { vec![123] } else { vec![12] };
     }
+
+    let previous = operations_builder(n - 1, is_part2, memos);
+    let mut out = vec![];
+    for list in previous {
+        out.push(list * 10 + 1);
+        out.push(list * 10 + 2);
+        if is_part2 {
+            out.push(list * 10 + 3);
+        }
+    }
+
+    memos.insert((n, is_part2), out.clone());
     out
 }
 
@@ -40,22 +44,38 @@ fn parse_line(line: &str) -> (u64, Vec<u64>) {
     (res, components)
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
+pub fn solve(input: &str, is_part2: bool) -> Option<u64> {
     let mut cum = 0;
+
+    let mut memos = HashMap::new();
 
     for line in input.lines() {
         let (res, components) = parse_line(line);
-        let operations = operations_builder(components.len() - 1, false);
-        for op in operations {
+        let operations = operations_builder(components.len() - 1, is_part2, &mut memos);
+        for ops in operations {
             let mut numbers = components.clone().into_iter();
             let mut acc = numbers.next().unwrap();
 
-            for (num, op) in numbers.zip(op.into_iter()) {
-                if op == '+' {
-                    acc += num;
-                }
-                if op == '*' {
-                    acc *= num;
+            let x = successors(Some((0, ops)), |(_, op)| {
+                if *op == 0 {
+                None
+            } else {
+                Some((
+                    op % 10,
+                    op / 10
+                ))
+            }}).skip(1).map(|(n, _)| n);
+
+            for (num, op) in numbers.zip(x) {
+                match op {
+                    1 => acc += num,
+                    2 => acc *= num,
+                    3 => {
+                        acc *= 10_u64.pow(num.ilog10() + 1);
+                        acc += num;
+                    }
+                    _ => panic!("{}", ops),
+
                 }
             }
 
@@ -68,36 +88,12 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(cum)
 }
 
+pub fn part_one(input: &str) -> Option<u64> {
+    solve(input, false)
+}
+
 pub fn part_two(input: &str) -> Option<u64> {
-    let mut cum = 0;
-
-    for line in input.lines() {
-        let (res, components) = parse_line(line);
-        let operations = operations_builder(components.len() - 1, true);
-        for op in operations {
-            let mut numbers = components.clone().into_iter();
-            let mut acc = numbers.next().unwrap();
-
-            for (num, op) in numbers.zip(op.into_iter()) {
-                if op == '+' {
-                    acc += num;
-                }
-                if op == '*' {
-                    acc *= num;
-                }
-                if op == '|' {
-                    acc *= 10_u64.pow(num.to_string().len() as u32);
-                    acc += num;
-                }
-            }
-
-            if res == acc {
-                cum += res;
-                break;
-            }
-        }
-    }
-    Some(cum)
+    solve(input, true)
 }
 
 #[cfg(test)]
