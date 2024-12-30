@@ -18,7 +18,8 @@ pub fn split_input_at_emptyline(input: &str) -> Vec<Vec<&str>> {
 
 pub mod grid {
     use std::{
-        fmt::{Debug, Display}, ops::Deref
+        fmt::{Debug, Display},
+        ops::{Deref, DerefMut},
     };
 
     #[derive(Debug)]
@@ -30,6 +31,15 @@ pub mod grid {
     {
         pub fn new(inner: Vec<Vec<T>>) -> Self {
             Grid(inner)
+        }
+
+        pub fn set(&mut self, (x, y): (usize, usize), v: T) -> Result<(), &str> {
+            if y < self.len() && x < self[0].len() {
+                self[y][x] = v;
+                Ok(())
+            } else {
+                Err("Out of bounds")
+            }
         }
 
         pub fn get(&self, (x, y): (usize, usize)) -> Option<&T> {
@@ -107,6 +117,12 @@ pub mod grid {
 
         fn deref(&self) -> &Self::Target {
             &self.0
+        }
+    }
+
+    impl<T> DerefMut for Grid<T> {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            &mut self.0
         }
     }
 
