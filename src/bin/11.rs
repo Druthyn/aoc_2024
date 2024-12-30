@@ -1,7 +1,8 @@
-use std::vec;
+use std::{collections::HashMap, vec};
 
 advent_of_code::solution!(11);
 
+#[allow(dead_code)]
 fn blink_naive(stones: &[u64]) -> Vec<u64> {
     let mut out = vec![];
     for &stone in stones {
@@ -27,24 +28,48 @@ fn blink_naive(stones: &[u64]) -> Vec<u64> {
     out
 }
 
-// fn blink(_stones: &[u64]) -> Vec<u64> {
-//     todo!()
-// }
+fn blink(stones: &[u64], iterations: usize) -> u64 {
+    fn count(stone: u64, steps: usize, memos: &mut HashMap<(u64, usize), u64>) -> u64 {
+        if memos.contains_key(&(stone, steps)) {
+            return *memos.get(&(stone, steps)).unwrap();
+        }
+        if steps == 0 {
+            return 1;
+        }
+
+        let res;
+
+        if stone == 0 {
+            res = count(1, steps - 1, memos);
+        } else if (stone.ilog10() + 1) % 2 == 0 {
+            let stone_front = stone / 10_u64.pow((stone.ilog10() + 1) / 2);
+            let stone_back = stone - stone_front * 10_u64.pow((stone.ilog10() + 1) / 2);
+            res = count(stone_front, steps - 1, memos) + count(stone_back, steps - 1, memos);
+        } else {
+            res = count(stone * 2024, steps - 1, memos);
+        }
+        memos.insert((stone, steps), res);
+        res
+    }
+
+    let mut memos: HashMap<(u64, usize), u64> = HashMap::new();
+
+    let mut sum = 0;
+    for stone in stones {
+        sum += count(*stone, iterations, &mut memos);
+    }
+
+    sum
+}
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let mut stones: Vec<u64> = input.split(" ").map(|s| s.parse().unwrap()).collect();
-    for _ in 0..25 {
-        stones = blink_naive(&stones);
-    }
-    Some(stones.len() as u64)
+    let stones: Vec<u64> = input.split(" ").map(|s| s.parse().unwrap()).collect();
+    Some(blink(&stones, 25))
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let mut stones: Vec<u64> = input.split(" ").map(|s| s.parse().unwrap()).collect();
-    for _ in 0..7 {
-        stones = blink_naive(&stones);
-    }
-    Some(stones.len() as u64)
+    let stones: Vec<u64> = input.split(" ").map(|s| s.parse().unwrap()).collect();
+    Some(blink(&stones, 75))
 }
 
 #[cfg(test)]
